@@ -1,26 +1,48 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useRef } from 'react';
+import useStateHistory from './useStateHistory';
 
-function App() {
+const CHAR_LIMIT: number=10;
+
+const App = () => {
+  const {
+    value,
+    updateHistory,
+    resetValue,
+    cursor,
+    historyStackSize,
+    undo,
+    redo, 
+  } = useStateHistory('',CHAR_LIMIT);
+
+  const inputRef = useRef(null as any);
+  inputRef.current?.focus();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <form onSubmit={(e)=>e.preventDefault()}>
+      <div>
+      <input
+        autoFocus={true}
+        ref={inputRef}
+        onChange={(event) => updateHistory(event.target.value)}
+        value={value}
+      />
+      </div>
+      <div>
+        <button
+          onClick={() => undo()}
+          disabled={cursor <= 0}
         >
-          Learn React
-        </a>
-      </header>
-    </div>
+          Undo
+        </button>
+        <button
+          onClick={() => redo()}
+          disabled={cursor >= historyStackSize}
+        >
+          Redo
+        </button>
+        <button onClick={() => resetValue('')}>Reset</button>
+      </div>
+    </form>
   );
 }
-
 export default App;
